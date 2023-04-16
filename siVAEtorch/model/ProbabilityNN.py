@@ -1,4 +1,6 @@
 from torch import nn
+import torch.nn.functional as F
+
 from torch.distributions import Normal
 
 from transformers.utils import ModelOutput
@@ -18,12 +20,14 @@ class PNNConfiguration(Configuration):
                  final_activation = None,
                  **kwargs):
 
-        super().__init__(output_dist=output_dist,
-                         output_size=output_size,
-                         hidden_layers=hidden_layers,
-                         hidden_activation=hidden_activation,
-                         final_activation=final_activation,
-                         **kwargs)
+        super().__init__(
+            output_dist=output_dist,
+            output_size=output_size,
+            hidden_layers=hidden_layers,
+            hidden_activation=hidden_activation,
+            final_activation=final_activation,
+            **kwargs
+        )
 
 
 class ProbabilityNN(nn.Module):

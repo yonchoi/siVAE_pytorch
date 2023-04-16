@@ -1,3 +1,5 @@
+from typing import List, Optional, Tuple, Union
+
 from torch import nn
 from transformers.utils import ModelOutput
 

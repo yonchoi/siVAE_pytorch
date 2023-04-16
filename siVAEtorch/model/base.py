@@ -55,7 +55,7 @@ class NN(nn.Module):
 
         self.convs = nn.ModuleList()
 
-        outshape = [1] + list(input_shape)
+        outshape = [1] + list(np.array(input_shape))
 
         if out_channels is None:
             # Set out_channels to in_channels

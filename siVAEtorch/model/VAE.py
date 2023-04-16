@@ -77,8 +77,8 @@ class VAE(nn.Module):
 
         self.config = config
 
-        self.encoder_config = VAEConfiguration().create_encoder()
-        self.decoder_config = VAEConfiguration().create_decoder()
+        self.encoder_config = config.create_encoder()
+        self.decoder_config = config.create_decoder()
 
         self.encoder = ProbabilityNN(self.encoder_config)
         self.decoder = ProbabilityNN(self.decoder_config)

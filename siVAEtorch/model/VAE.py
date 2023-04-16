@@ -83,7 +83,7 @@ class VAE(nn.Module):
         self.encoder = ProbabilityNN(self.encoder_config)
         self.decoder = ProbabilityNN(self.decoder_config)
 
-    def forward(x, return_all=True, **kwargs):
+    def forward(self, x, return_all=True, **kwargs):
 
         encoder_outputs = self.encoder(x)
         decoder_outputs = self.decoder(encoder_outputs.sample)

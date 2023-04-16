@@ -61,6 +61,7 @@ class siVAE(nn.Module):
 
 
     def forward(
+        self,
         x,
         **kwargs
     ):

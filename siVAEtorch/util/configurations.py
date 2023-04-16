@@ -11,3 +11,6 @@ class Configuration():
 
         with open(filename, "w") as outfile:
             json.dump(self.__dict__, outfile)
+
+    def __index__(self, kwarg):
+        return self.__dict__[kwarg]

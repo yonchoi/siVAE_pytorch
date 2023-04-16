@@ -1,0 +1,7 @@
+torch==1.12.1
+torchshape
+transformers
+numpy
+pandas
+seaborn
+scikit-learn

@@ -28,7 +28,7 @@ class NN(nn.Module):
     """
 
     def __init__(self,
-                 input_shape: Union[list,int],
+                 input_shape: Union[int],
                  output_size: Optional[int] = None,
                  n_conv_layers: int = 0,
                  hidden_layers: list = [],
@@ -48,37 +48,39 @@ class NN(nn.Module):
         self.hidden_activation = hidden_activation
 
         # Convolutional nets
-        self.pool = nn.MaxPool1d(
-            kernel_size=mp_kernel_size,
-            stride=mp_stride
-            )
+        # self.pool = nn.MaxPool1d(
+        #     kernel_size=mp_kernel_size,
+        #     stride=mp_stride
+        #     )
+        #
+        # self.convs = nn.ModuleList()
 
-        self.convs = nn.ModuleList()
+        # outshape = [1] + list(np.array(1).reshape(-1))
+        #
+        # if out_channels is None:
+        #     # Set out_channels to in_channels
+        #     out_channels = outshape[1]
+        #
+        # print('CNN')
+        # for i in range(n_conv_layers):
+        #     print(i,outshape)
+        #     conv = nn.Conv1d(
+        #         in_channels=outshape[1],
+        #         out_channels=out_channels,
+        #         kernel_size=kernel_size,
+        #         stride=stride,
+        #         )
+        #     self.convs.append(conv)
+        #     outshape = tensorshape(conv, outshape)
+        #     print(i,outshape)
+        #     outshape = tensorshape(self.pool, outshape)
+        #     print(i,outshape)
+        #
+        # current_size = np.prod(outshape)
+        #
+        # print('final_size',current_size)
 
-        outshape = [1] + list(np.array(1).reshape(-1))
-
-        if out_channels is None:
-            # Set out_channels to in_channels
-            out_channels = outshape[1]
-
-        print('CNN')
-        for i in range(n_conv_layers):
-            print(i,outshape)
-            conv = nn.Conv1d(
-                in_channels=outshape[1],
-                out_channels=out_channels,
-                kernel_size=kernel_size,
-                stride=stride,
-                )
-            self.convs.append(conv)
-            outshape = tensorshape(conv, outshape)
-            print(i,outshape)
-            outshape = tensorshape(self.pool, outshape)
-            print(i,outshape)
-
-        current_size = np.prod(outshape)
-
-        print('final_size',current_size)
+        current_size = input_size
 
         # Fully connected layers
         if self.output_size is not None:
@@ -99,11 +101,11 @@ class NN(nn.Module):
 
     def forward(self, x, return_hidden=False, **kwargs):
 
-        for conv in self.convs:
-            x = self.hidden_activation(conv(x))
-            x = self.pool(x)
-
-        x = torch.flatten(x, 1) # flatten all dimensions except batch
+        # for conv in self.convs:
+        #     x = self.hidden_activation(conv(x))
+        #     x = self.pool(x)
+        #
+        # x = torch.flatten(x, 1) # flatten all dimensions except batch
 
         output = ModelOutput()
 

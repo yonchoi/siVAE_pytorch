@@ -82,6 +82,8 @@ class ProbabilityNN(nn.Module):
 
         else:
 
+            print('return_hidden_only',return_hidden_only)
+
             if self.config.output_dist == 'gaus':
 
                 # Set parameters

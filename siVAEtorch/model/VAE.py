@@ -86,7 +86,9 @@ class VAE(nn.Module):
     def forward(self, x, return_all=True, **kwargs):
 
         encoder_outputs = self.encoder(x)
-        decoder_outputs = self.decoder(encoder_outputs.sample)
+        decoder_outputs = self.decoder(encoder_outputs.sample,
+                                       **kwargs
+                                       )
 
         if return_all:
             output = ModelOutput(decoder=decoder_outputs,

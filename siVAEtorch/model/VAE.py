@@ -28,7 +28,7 @@ class VAEConfiguration(Configuration):
             output_dist=output_dist,
             output_size=output_size,
             hidden_layers=hidden_layers,
-            hidden_layers_decoder=hidden_layeres_decoder,
+            hidden_layers_decoder=hidden_layers_decoder,
             hidden_activation=hidden_activation,
             final_activation=final_activation,
             **kwargs)

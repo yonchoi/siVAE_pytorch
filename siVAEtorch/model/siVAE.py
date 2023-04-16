@@ -55,8 +55,8 @@ class siVAE(nn.Module):
 
         self.config = config
 
-        self.cell_vae    = VAE(config)
-        self.feature_vae = VAE(config)
+        self.cell_vae    = VAE(config.create_cell_config())
+        self.feature_vae = VAE(config.create_feature_config())
 
 
     def forward(

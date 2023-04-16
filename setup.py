@@ -11,6 +11,7 @@ setup(
     python_requires=">=3.8",
     install_requires=['scanpy',
                       'loompy',
+                      'torchshape',
                       ],  # Optional
     # include_package_data=True,
     # data_files = [('model', ['./BIVI/models/best_model_MODEL.zip'])],

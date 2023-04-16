@@ -1,6 +1,8 @@
 from typing import List, Optional, Tuple, Union
 
 from torch import nn
+import torch.nn.functional as F
+
 from transformers.utils import ModelOutput
 
 from .ProbabilityNN import ProbabilityNN, PNNConfiguration

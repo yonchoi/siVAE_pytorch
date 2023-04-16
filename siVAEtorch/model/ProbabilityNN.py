@@ -2,7 +2,6 @@ from typing import List, Optional, Tuple, Union
 
 from torch import nn
 import torch.nn.functional as F
-
 from torch.distributions import Normal
 
 from transformers.utils import ModelOutput

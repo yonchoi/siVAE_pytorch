@@ -12,6 +12,7 @@ class siVAEConfiguration(Configuration):
 
     def __init__(self,
                  gamma: float = 0.05,
+                 n_cells: int = 500,
                  **kwargs):
 
         super().__init__(
@@ -33,6 +34,9 @@ class siVAEConfiguration(Configuration):
         feature_config = VAEConfiguration(
             **self.__dict__
         )
+
+        feature_config.output_size = feature_config.hidden_layers[-1]
+        feature_config.hidden_layers_decoder = feature_config.hidden_layers[::-1][:-1]
 
         return feature_config
 

@@ -17,6 +17,7 @@ class VAEConfiguration(Configuration):
                  output_size: int = 1024,
                  latent_dim : int = 2,
                  hidden_layers: Optional[list] = [512, 128],
+                 hidden_layers_decoder: Union[list,None] = None,
                  hidden_activation = F.relu,
                  final_activation = None,
                  **kwargs):
@@ -27,6 +28,7 @@ class VAEConfiguration(Configuration):
             output_dist=output_dist,
             output_size=output_size,
             hidden_layers=hidden_layers,
+            hidden_layers_decoder=hidden_layeres_decoder,
             hidden_activation=hidden_activation,
             final_activation=final_activation,
             **kwargs)
@@ -56,8 +58,12 @@ class VAEConfiguration(Configuration):
         decoder_config.input_size = input_size
 
         # Reverse order for decoder
-        hidden_layers = decoder_config.hidden_layers[::-1]
-        decoder_config.hidden_layers = hidden_layers
+        if self.hidden_layers_decoder is None:
+            hidden_layers = decoder_config.hidden_layers[::-1]
+            decoder_config.hidden_layers = hidden_layers
+        else:
+            hidden_layers = decoder_config.hidden_layers_decoder
+            decoder_config.hidden_layers = hidden_layers
 
         return decoder_config
 

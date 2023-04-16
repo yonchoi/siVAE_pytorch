@@ -39,6 +39,7 @@ class NN(nn.Module):
                  stride: int = 1,
                  mp_kernel_size: Optional[int] = 2,
                  mp_stride: Optional[int] = 1,
+                 dropout_rate: float = 0.1
                  ):
 
         super().__init__()
@@ -46,6 +47,8 @@ class NN(nn.Module):
         self.output_size = output_size
         # self.loss_fct = loss_fct
         self.hidden_activation = hidden_activation
+
+        self.drop = nn.Dropout(dropout_rate)
 
         # Convolutional nets
         # self.pool = nn.MaxPool1d(
@@ -112,7 +115,11 @@ class NN(nn.Module):
         if self.output_size is not None:
 
             for layer in self.fcs[:-1]:
+
                 x = self.hidden_activation(layer(x))
+
+                if self.training:
+                    x = self.drop(x)
 
             x = self.fcs[-1](x)
 

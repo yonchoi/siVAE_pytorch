@@ -66,6 +66,7 @@ class ProbabilityNN(nn.Module):
             final_activation = config.final_activation,
         )
 
+        self.softplus = nn.Softplus()
 
     def forward(self, x, return_hidden_only=False, **kwargs):
 

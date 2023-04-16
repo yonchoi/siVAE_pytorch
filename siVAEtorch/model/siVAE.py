@@ -35,6 +35,8 @@ class siVAEConfiguration(Configuration):
             **self.__dict__
         )
 
+        feature_config.input_size = self.n_cells
+
         feature_config.output_size = feature_config.hidden_layers[-1]
         feature_config.hidden_layers_decoder = feature_config.hidden_layers[::-1][:-1]
 

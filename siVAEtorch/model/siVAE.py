@@ -17,6 +17,7 @@ class siVAEConfiguration(Configuration):
 
         super().__init__(
             gamma=gamma,
+            n_cells=n_cells,
             **kwargs)
 
     def create_cell_config(self):

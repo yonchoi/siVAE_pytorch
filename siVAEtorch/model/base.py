@@ -28,7 +28,7 @@ class NN(nn.Module):
     """
 
     def __init__(self,
-                 input_shape: Union[int],
+                 input_shape: Union[list,int],
                  output_size: Optional[int] = None,
                  n_conv_layers: int = 0,
                  hidden_layers: list = [],

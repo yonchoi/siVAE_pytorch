@@ -59,7 +59,7 @@ class ProbabilityNN(nn.Module):
             raise Exception('Input valid output_dist')
 
         self.nn = NN(
-            input_size = config.input_size,
+            input_shape = config.input_size,
             output_size = output_size,
             hidden_layers = config.hidden_layers,
             hidden_activation = config.hidden_activation,

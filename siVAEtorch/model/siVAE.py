@@ -3,8 +3,8 @@ from typing import List, Optional, Tuple, Union
 from torch import nn
 from transformers.utils import ModelOutput
 
-from .VAE import VAE,VAEConfiguration
-from .ProbabilityNN import ProbabilityNN, PNNConfiguration
+from siVAEtorch.model.VAE import VAE,VAEConfiguration
+from siVAEtorch.model.ProbabilityNN import ProbabilityNN, PNNConfiguration
 from siVAEtorch.util.configurations import Configuration
 
 
@@ -38,7 +38,7 @@ class siVAEConfiguration(Configuration):
 
         feature_config.input_size = self.n_cells
 
-        feature_config.output_size = feature_config.hidden_layers[-1]
+        feature_config.output_size = feature_config.hidden_layers[::-1][-1]
         feature_config.hidden_layers_decoder = feature_config.hidden_layers[::-1][:-1]
 
         return feature_config

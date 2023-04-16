@@ -48,7 +48,7 @@ class ProbabilityNN(nn.Module):
         # Set prior based on the latent_dim type
         output_dist = config.output_dist
         if output_dist == 'gaus':
-            self.prior = torch.distributions.Normal(
+            self.prior = Normal(
                 torch.zeros(config.output_size),
                 torch.ones(config.output_size)
             )

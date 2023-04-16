@@ -23,6 +23,7 @@ class PNNConfiguration(Configuration):
                  **kwargs):
 
         super().__init__(
+            input_size = input_size,
             output_dist=output_dist,
             output_size=output_size,
             hidden_layers=hidden_layers,

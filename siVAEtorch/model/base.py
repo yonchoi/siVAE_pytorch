@@ -80,7 +80,7 @@ class NN(nn.Module):
         #
         # print('final_size',current_size)
 
-        current_size = input_size
+        current_size = input_shape
 
         # Fully connected layers
         if self.output_size is not None:

@@ -107,6 +107,9 @@ class ProbabilityNN(nn.Module):
             output.var=z_var
             output.sample=sample
 
+            print('output_dist',output.dist)
+            print('output',output)
+
         return output
 
 

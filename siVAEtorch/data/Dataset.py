@@ -11,13 +11,14 @@ from torch.utils.data import Dataset
 
 class VAEDataset(Dataset):
 
-    def __init__(self, adata, cuda=True):
+    def __init__(self, adata, cuda=True, target=None):
 
         self.adata = adata
 
         self.X        = torch.tensor(adata.X).float()
         self.labels   = list(adata.obs.Labels.values)
         self.label_id = np.arange(len(adata.X))
+        self.target   = target
 
         if cuda:
           self.X.cuda()
@@ -29,4 +30,10 @@ class VAEDataset(Dataset):
         inputs = {'X': self.X[item],
                   'labels': self.labels[item],
                   'label_id': self.label_id[item]}
+
+        if target is not None:
+            inputs['target'] = self.target[item]
+        else:
+            inputs['target'] = self.X[item]
+
         return inputs

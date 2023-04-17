@@ -74,7 +74,7 @@ class ProbabilityNN(nn.Module):
         x = nn_output.x
         h = nn_output.h
 
-        output = ModelOutput(h = h
+        output = ModelOutput(h = h,
                              x = x,)
 
         if return_hidden_only:

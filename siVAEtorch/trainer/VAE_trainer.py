@@ -1,36 +1,24 @@
+from transformers import Trainer
+
+from torch.distributions.kl import kl_divergence as kl_div
+
 import torch
 from torch import nn
-
-from transformers import Trainer
-from transformers.utils import ModelOutput
 
 import numpy as np
 from tqdm import tqdm
 
+def KL_loss(prior,posterior):
+    kl_loss = kl_div(prior,posterior)
+    return kl_loss
+
+def Recon_loss(X_dist, X):
+    """ NLL of predicted gene expression distribution """
+    return -X_dist.log_prob(X)
+
 class CustomTrainer(Trainer):
 
     def compute_loss(self, model, inputs, return_outputs=False):
-
-        labels = inputs["labels"]
-
-        outputs = model(inputs)
-
-        try:
-            loss_fct = model.loss_fct
-        except:
-            loss_fct = nn.CrossEntropyLoss()
-
-        logits = outputs.get("logits")
-
-        if model.output_size > 1:
-            loss = loss_fct(logits.view(-1, 2), labels.view(-1))
-        else:
-            loss = loss_fct(logits.view(-1), labels.view(-1))
-
-        return (loss, outputs) if return_outputs else loss
-
-
-    def compute_metrics(self, model, inputs, return_outputs=False):
 
         labels = inputs["labels"]
 
@@ -39,20 +27,32 @@ class CustomTrainer(Trainer):
 
         outputs = model(inputs)
 
-        try:
-            loss_fct = model.loss_fct
-        except:
-            loss_fct = nn.CrossEntropyLoss()
+        # Sum across output features, average across samples
+        recon_loss = Recon_loss(outputs.decoder.dist, inputs['X']).sum(-1).mean()
+        # Sum across latent features, average across samples
+        kl_loss    = KL_loss(model.encoder.prior, outputs.encoder.dist).sum(-1).mean()
+        # loss = recon_loss + kl_loss
+        loss = recon_loss + kl_loss
 
-        logits = outputs.get("logits")
+        return (loss, outputs) if return_outputs else loss
 
-        if model.output_size > 1:
-            loss = loss_fct(logits.view(-1, 2), labels.view(-1))
-        else:
-            raise Exception(f"{logits.get_device()},{labels.get_device()}")
-            loss = loss_fct(logits.view(-1), labels.view(-1))
 
-        return {'nloss': -loss}
+    def compute_metrics(self, model, inputs, return_outputs=False):
+
+        labels = inputs["labels"]
+
+        outputs = model(inputs)
+
+        # Sum across output features, average across samples
+        recon_loss = Recon_loss(outputs.decoder.dist, inputs['X']).sum(-1).mean()
+        # Sum across latent features, average across samples
+        kl_loss    = KL_loss(model.encoder.prior, outputs.encoder.dist).sum(-1).mean()
+        # loss = recon_loss + kl_loss
+        loss = recon_loss + kl_loss
+
+        return {'Total': loss,
+                'KL loss': kl_loss,
+                'Recon loss': recon_loss}
 
 
 def evaluate(dataset, model, batch_size=16, num_workers=1, **kwargs):

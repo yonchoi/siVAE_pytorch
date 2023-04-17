@@ -90,7 +90,7 @@ class siVAE(nn.Module):
         **kwargs
     ):
 
-        cell_output    = self.cell_vae(X,return_hidden_only=True)
+        cell_output    = self.cell_vae(X)
 
         if self.feature_embeddings is None:
             raise Exception('feature_embeddings is none, run save_feature_embedding')

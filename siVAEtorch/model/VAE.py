@@ -85,6 +85,8 @@ class VAE(nn.Module):
 
     def forward(self, X):
 
+        return_all = True
+
         encoder_outputs = self.encoder(X)
         decoder_outputs = self.decoder(encoder_outputs.sample)
 

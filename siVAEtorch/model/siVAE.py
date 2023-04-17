@@ -2,6 +2,7 @@ from typing import List, Optional, Tuple, Union
 
 from torch import nn
 from transformers.utils import ModelOutput
+from torch.distributions import Normal
 
 from siVAEtorch.model.VAE import VAE,VAEConfiguration
 from siVAEtorch.model.ProbabilityNN import ProbabilityNN, PNNConfiguration
@@ -59,15 +60,44 @@ class siVAE(nn.Module):
         self.cell_vae    = VAE(config.create_cell_config())
         self.feature_vae = VAE(config.create_feature_config())
 
+        self.feature_embeddings = None
+
+        self.linear_bias = torch.ones(self.cell_vae.config.output_size).cuda()
+
+
+    def save_feature_embedding(self, feature_ds):
+
+        v_mu = []
+        w_mu = []
+
+        with torch.no_grad():
+            for inputs in feature_ds:
+                outputs = self.feature_vae(inputs['X'])
+                v_mu.append(outputs.encoder.mu)
+                w_mu.append(outputs.decoder.mu)
+
+        v_mu = torch.stack(v_mu)
+        w_mu = torch.stack(w_mu)
+
+        self.feature_embeddings = ModelOutput(v=v_mu,
+                                              w=w_mu)
+
 
     def forward(
         self,
-        x,
+        X,
         **kwargs
     ):
 
-        cell_output    = self.cell_vae(x,return_hidden_only=True)
-        feature_output = self.feature_vae(x,)
+        cell_output    = self.cell_vae(X,return_hidden_only=True)
+
+        if self.feature_embeddings is None:
+            raise Exception('feature_embeddings is none, run save_feature_embedding')
+        else:
+            feature_output = self.feature_embeddings
+
+        final_dist  = self.calculate_output_dist(cell_output, feature_output)
+        linear_dist = self.calculate_output_dist_linear(cell_output, feature_output)
 
         combined_output = ModelOutput(
             final = final_dist,
@@ -80,7 +110,7 @@ class siVAE(nn.Module):
             combined=combined_output
         )
 
-        return decoder_outputs
+        return output
 
 
     def calculate_output_dist(
@@ -93,16 +123,23 @@ class siVAE(nn.Module):
         """
 
         cell_h = cell_output.decoder.h
-        feature_h = feature_output.decoder.mu
+        # feature_h = feature_output.decoder.mu
+        feature_h = feature_output.w.transpose(0,1)
 
-        X = torch.matmul(cell_h,feature_h) + self.cell_vae.get_final_weight().bias
-        return X
+        bias = self.cell_vae.decoder.get_final_weight().bias
+        bias = torch.chunk(bias,2,dim=-1)[0]
+        X = torch.matmul(cell_h,feature_h) + bias
+
+        dist = Normal(X,
+                      cell_output.decoder.dist.scale)
+
+        return dist
 
 
     def calculate_output_dist_linear(
         self,
         cell_output,
-        feature_output,
+        feature_output
     ):
         """
         Calculate the final output distribution for siVAE based on cell/feature
@@ -110,6 +147,10 @@ class siVAE(nn.Module):
         """
 
         cell_latent = cell_output.encoder.mu
-        feature_latent = feature_output.encoder.mu
+        feature_latent = feature_output.v.transpose(0,1)
 
-        return torch.matmul(cell_latent, feature_latent)
+        X = torch.matmul(cell_latent, feature_latent)
+
+        dist = Normal(X,self.linear_bias)
+
+        return dist

@@ -61,8 +61,6 @@ class siVAE(nn.Module):
         self.cell_vae    = VAE(config.create_cell_config())
         self.feature_vae = VAE(config.create_feature_config())
 
-        self.feature_embeddings = None
-
         self.linear_bias = torch.ones(self.cell_vae.config.output_size).cuda()
 
 
@@ -87,16 +85,13 @@ class siVAE(nn.Module):
     def forward(
         self,
         X,
+        X_t,
         target=None,
         **kwargs
     ):
 
         cell_output    = self.cell_vae(X)
-
-        if self.feature_embeddings is None:
-            raise Exception('feature_embeddings is none, run save_feature_embedding')
-        else:
-            feature_output = self.feature_embeddings
+        feature_output = self.feature_vae(X_t)
 
         final_dist  = self.calculate_output_dist(cell_output, feature_output)
         linear_dist = self.calculate_output_dist_linear(cell_output, feature_output)
@@ -126,7 +121,7 @@ class siVAE(nn.Module):
 
         cell_h = cell_output.decoder.h
         # feature_h = feature_output.decoder.mu
-        feature_h = feature_output.w.transpose(0,1)
+        feature_h = feature_output.decoder.mu.transpose(0,1)
 
         bias = self.cell_vae.decoder.get_final_weight().bias
         bias = torch.chunk(bias,2,dim=-1)[0]
@@ -149,7 +144,7 @@ class siVAE(nn.Module):
         """
 
         cell_latent = cell_output.encoder.mu
-        feature_latent = feature_output.v.transpose(0,1)
+        feature_latent = feature_output.encoder.mu.transpose(0,1)
 
         X = torch.matmul(cell_latent, feature_latent)
 

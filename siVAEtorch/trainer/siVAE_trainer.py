@@ -16,11 +16,12 @@ def Recon_loss(X_dist, X):
     """ NLL of predicted gene expression distribution """
     return -X_dist.log_prob(X)
 
-class CustomTrainer(Trainer):
+
+class siVAETrainer(Trainer):
 
     def compute_loss(self, model, inputs, return_outputs=False):
 
-        labels = inputs["labels"]
+        # labels = inputs["labels"]
 
         # input_ids = torch.squeeze(inputs['input_ids'],dim=1)
         # attention_mask = torch.squeeze(inputs['attention_mask'],dim=1)
@@ -28,9 +29,15 @@ class CustomTrainer(Trainer):
         outputs = model(inputs)
 
         # Sum across output features, average across samples
-        recon_loss = Recon_loss(outputs.decoder.dist, inputs['X']).sum(-1).mean()
+        recon_loss_final = Recon_loss(outputs.combined.final, inputs['target']).sum(-1).mean()
+        recon_loss_linear = Recon_loss(outputs.combined.linear, inputs['target']).sum(-1).mean()
+        recon_loss = recon_loss_final + recon_loss_linear * model.config.gamma
+
         # Sum across latent features, average across samples
-        kl_loss    = KL_loss(model.encoder.prior, outputs.encoder.dist).sum(-1).mean()
+        kl_loss_cell    = KL_loss(model.cell.encoder.prior, outputs.cell.encoder.dist).sum(-1).mean()
+        kl_loss_feature = KL_loss(model.feature.encoder.prior, outputs.feature.encoder.dist).sum(-1).mean()
+        kl_loss = kl_loss_cell + kl_loss_feature
+
         # loss = recon_loss + kl_loss
         loss = recon_loss + kl_loss
 
@@ -39,18 +46,27 @@ class CustomTrainer(Trainer):
 
     def compute_metrics(self, model, inputs, return_outputs=False):
 
-        labels = inputs["labels"]
+        # labels = inputs["labels"]
+
+        # input_ids = torch.squeeze(inputs['input_ids'],dim=1)
+        # attention_mask = torch.squeeze(inputs['attention_mask'],dim=1)
 
         outputs = model(inputs)
 
         # Sum across output features, average across samples
-        recon_loss = Recon_loss(outputs.decoder.dist, inputs['X']).sum(-1).mean()
+        recon_loss_final = Recon_loss(outputs.combined.final, inputs['target']).sum(-1).mean()
+        recon_loss_linear = Recon_loss(outputs.combined.linear, inputs['target']).sum(-1).mean()
+        recon_loss = recon_loss_final + recon_loss_linear * model.config.gamma
+
         # Sum across latent features, average across samples
-        kl_loss    = KL_loss(model.encoder.prior, outputs.encoder.dist).sum(-1).mean()
+        kl_loss_cell    = KL_loss(model.cell.encoder.prior, outputs.cell.encoder.dist).sum(-1).mean()
+        kl_loss_feature = KL_loss(model.feature.encoder.prior, outputs.feature.encoder.dist).sum(-1).mean()
+        kl_loss = kl_loss_cell + kl_loss_feature
+
         # loss = recon_loss + kl_loss
         loss = recon_loss + kl_loss
 
-        return {'Total': loss,
+        return {'loss': loss,
                 'KL loss': kl_loss,
                 'Recon loss': recon_loss}
 

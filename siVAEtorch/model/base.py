@@ -121,10 +121,10 @@ class NN(nn.Module):
                 if self.training:
                     x = self.drop(x)
 
-            x = self.fcs[-1](x)
-
             if return_hidden:
                 output.h = x
+
+            x = self.fcs[-1](x)
 
             if self.final_activation:
                 x = self.final_activation(x)

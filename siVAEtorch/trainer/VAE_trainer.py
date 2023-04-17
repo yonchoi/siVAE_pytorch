@@ -13,9 +13,6 @@ class CustomTrainer(Trainer):
 
         labels = inputs["labels"]
 
-        # input_ids = torch.squeeze(inputs['input_ids'],dim=1)
-        # attention_mask = torch.squeeze(inputs['attention_mask'],dim=1)
-
         outputs = model(inputs)
 
         try:

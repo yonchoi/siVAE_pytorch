@@ -31,7 +31,7 @@ class VAEDataset(Dataset):
                   'labels': self.labels[item],
                   'label_id': self.label_id[item]}
 
-        if target is not None:
+        if self.target is not None:
             inputs['target'] = self.target[item]
         else:
             inputs['target'] = self.X[item]

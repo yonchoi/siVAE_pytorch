@@ -83,7 +83,10 @@ class VAE(nn.Module):
         self.encoder = ProbabilityNN(self.encoder_config)
         self.decoder = ProbabilityNN(self.decoder_config)
 
-    def forward(self, X):
+    def forward(self, X, target = None):
+        """
+        Add target as input so trainer will save target
+        """
 
         return_all = True
 

@@ -63,6 +63,10 @@ class siVAE(nn.Module):
 
         self.linear_bias = torch.ones(self.cell_vae.config.output_size).cuda()
 
+        self.X_t = None
+
+    def set_transpose(self, X_t):
+        self.X_t = X_t
 
     def save_feature_embedding(self, feature_ds):
 
@@ -85,13 +89,12 @@ class siVAE(nn.Module):
     def forward(
         self,
         X,
-        X_t,
         target=None,
         **kwargs
     ):
 
         cell_output    = self.cell_vae(X)
-        feature_output = self.feature_vae(X_t)
+        feature_output = self.feature_vae(self.X_t)
 
         final_dist  = self.calculate_output_dist(cell_output, feature_output)
         linear_dist = self.calculate_output_dist_linear(cell_output, feature_output)
